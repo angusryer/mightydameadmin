@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import Amplify, { Auth } from "aws-amplify";
+import { Auth } from "aws-amplify";
 import SignUp from "./components/SignUp";
 import ConfirmSignUp from "./components/ConfirmSignUp";
 import SignIn from "./components/SignIn";
 
-import config from "./aws-exports";
-
-Amplify.configure(config);
+import ForgotPassword from "./components/ForgotPassword";
+import Admin from "./components/Admin";
 
 export default function App() {
 	const [formState, setFormState] = useState("signUp");
@@ -16,8 +15,8 @@ export default function App() {
 	const authStateMessage = "You are currently logged out.";
 
 	const toggleFormState = (newFormState) => {
-    setFormState(newFormState);
-    setFormError(null);
+		setFormState(newFormState);
+		setFormError(null);
 	};
 
 	useEffect(() => {
@@ -44,8 +43,8 @@ export default function App() {
 					setFormError(authStateMessage);
 				});
 		};
-    checkSigninStatus();
-    setFormError(null);
+		checkSigninStatus();
+		setFormError(null);
 	}, []);
 
 	const signUp = async (form) => {
@@ -101,7 +100,7 @@ export default function App() {
 							setFormError(null);
 						}
 					})
-					.catch((_err) => {
+					.catch((err) => {
 						setFormError(authStateMessage);
 					});
 			})
@@ -115,41 +114,36 @@ export default function App() {
 			.then((_res) => {
 				setFormState("signUp");
 				setIsAdmin(false);
-				setFormError(null);
+        setFormError(null);
+        window.location.href = "/"
 			})
 			.catch((err) => {
 				setFormError(err.message);
 			});
-  };
-  
-  const forgotPassword = async () => {
-    await Auth.forgotPassword()
-  }
+	};
 
 	const renderForm = (formState, isAdmin) => {
 		switch (formState) {
 			case "signUp":
 				return <SignUp signUp={signUp} toggleFormState={toggleFormState} />;
+
 			case "confirmSignUp":
 				return <ConfirmSignUp confirmSignUp={confirmSignUp} />;
+
 			case "signIn":
-				return <SignIn signIn={signIn} forgotPassword={forgotPassword} toggleFormState={toggleFormState} />;
+				return <SignIn signIn={signIn} toggleFormState={toggleFormState} />;
+
 			case "signedIn":
-				return isAdmin ? (
-					<>
-						<h3>Logged in as an administrative user</h3>
-						<button type='button' onClick={signOut}>
-							Sign Out
-						</button>
-					</>
-				) : (
-					<>
-						<h3>You are logged in as a regular user</h3>
-						<button type='button' onClick={signOut}>
-							Sign Out
-						</button>
-					</>
-				);
+				if (isAdmin) {
+					return <Admin signOut={signOut} />
+				} else {
+					window.location.replace("https://main.d1yqt45w5sq9tb.amplifyapp.com/");
+				}
+				break;
+
+			case "forgotPassword":
+				return <ForgotPassword toggleFormState={toggleFormState} />;
+
 			default:
 				return null;
 		}
@@ -159,9 +153,6 @@ export default function App() {
 		<div className='flex flex-col'>
 			<div className='max-w-fw flex flex-col'>
 				<div className='pt-10'>
-					<h1 className='text-5xl font-light'>
-						Admin status: {isAdmin ? "ADMIN" : "NOT ADMIN"}
-					</h1>
 					<span>{formError}</span>
 				</div>
 				{renderForm(formState, isAdmin)}

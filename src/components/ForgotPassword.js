@@ -1,165 +1,160 @@
-// import React, { useState } from "react";
-// import { Auth } from "aws-amplify";
-// import { Link } from "react-router-dom";
-// import {
-//   HelpBlock,
-//   FormGroup,
-//   Glyphicon,
-//   FormControl,
-//   ControlLabel,
-// } from "react-bootstrap";
-// import LoaderButton from "../components/LoaderButton";
-// import { useFormFields } from "../libs/hooksLib";
-// import { onError } from "../libs/errorLib";
-// import "./ResetPassword.css";
+import React, { useState } from "react";
+import { Auth } from "aws-amplify";
+import { useFormFields } from "../lib/hooksLib";
+import { onError } from "../lib/errorLib";
 
-// export default function ResetPassword() {
-//   const [fields, handleFieldChange] = useFormFields({
-//     code: "",
-//     email: "",
-//     password: "",
-//     confirmPassword: "",
-//   });
-//   const [codeSent, setCodeSent] = useState(false);
-//   const [confirmed, setConfirmed] = useState(false);
-//   const [isConfirming, setIsConfirming] = useState(false);
-//   const [isSendingCode, setIsSendingCode] = useState(false);
+export default function ForgotPassword({ toggleFormState }) {
+	const [fields, handleFieldChange] = useFormFields({
+        username: "",
+		code: "",
+		email: "",
+		password: "",
+		confirmPassword: ""
+	});
+	const [codeSent, setCodeSent] = useState(false);
+	const [confirmed, setConfirmed] = useState(false);
+	const [isConfirming, setIsConfirming] = useState(false);
+	const [isSendingCode, setIsSendingCode] = useState(false);
 
-//   function validateCodeForm() {
-//     return fields.email.length > 0;
-//   }
+	const validateUsernameForm = () => {
+		return fields.username.length > 0;
+	};
 
-//   function validateResetForm() {
-//     return (
-//       fields.code.length > 0 &&
-//       fields.password.length > 0 &&
-//       fields.password === fields.confirmPassword
-//     );
-//   }
+	const validateResetForm = () => {
+		return (
+			fields.code.length > 0 &&
+			fields.password.length > 0 &&
+			fields.password === fields.confirmPassword
+		);
+	};
 
-//   async function handleSendCodeClick(event) {
-//     event.preventDefault();
+	const handleSendCodeClick = async (event) => {
+		event.preventDefault();
 
-//     setIsSendingCode(true);
+		setIsSendingCode(true);
 
-//     try {
-//       await Auth.forgotPassword(fields.email);
-//       setCodeSent(true);
-//     } catch (error) {
-//       onError(error);
-//       setIsSendingCode(false);
-//     }
-//   }
+		try {
+			await Auth.forgotPassword(fields.email)
+				.then((_res) => {
+					setCodeSent(true);
+				})
+				.catch((err) => {
+					console.log(err);
+				});
+		} catch (error) {
+			onError(error);
+			setIsSendingCode(false);
+		}
+	};
 
-//   async function handleConfirmClick(event) {
-//     event.preventDefault();
+	async function handleConfirmClick(event) {
+		event.preventDefault();
 
-//     setIsConfirming(true);
+		setIsConfirming(true);
 
-//     try {
-//       await Auth.forgotPasswordSubmit(
-//         fields.email,
-//         fields.code,
-//         fields.password
-//       );
-//       setConfirmed(true);
-//     } catch (error) {
-//       onError(error);
-//       setIsConfirming(false);
-//     }
-//   }
+		try {
+			await Auth.forgotPasswordSubmit(
+				fields.email,
+				fields.code,
+				fields.password
+			);
+			setConfirmed(true);
+		} catch (error) {
+			onError(error);
+			setIsConfirming(false);
+		}
+	}
 
-//   function renderRequestCodeForm() {
-//     return (
-//       <form onSubmit={handleSendCodeClick}>
-//         <FormGroup bsSize="large" controlId="email">
-//           <ControlLabel>Email</ControlLabel>
-//           <FormControl
-//             autoFocus
-//             type="email"
-//             value={fields.email}
-//             onChange={handleFieldChange}
-//           />
-//         </FormGroup>
-//         <LoaderButton
-//           block
-//           type="submit"
-//           bsSize="large"
-//           isLoading={isSendingCode}
-//           disabled={!validateCodeForm()}
-//         >
-//           Send Confirmation
-//         </LoaderButton>
-//       </form>
-//     );
-//   }
+	const renderRequestCodeForm = () => {
+		return (
+			<>
+				<h3>Request a validation code to the email you signed up with by providing your username below:</h3>
+				<form onSubmit={handleSendCodeClick}>
+					<div id='username'>
+						<label htmlFor='username'>Username</label>
+						<input
+							id='username'
+							autoFocus
+							type='text'
+							value={fields.username}
+							onChange={handleFieldChange}
+						/>
+					</div>
+					<button type='submit' disabled={!validateUsernameForm()}>
+						{isSendingCode ? "Sending confirmation..." : "Send Confirmation"}
+					</button>
+				</form>
+			</>
+		);
+	};
 
-//   function renderConfirmationForm() {
-//     return (
-//       <form onSubmit={handleConfirmClick}>
-//         <FormGroup bsSize="large" controlId="code">
-//           <ControlLabel>Confirmation Code</ControlLabel>
-//           <FormControl
-//             autoFocus
-//             type="tel"
-//             value={fields.code}
-//             onChange={handleFieldChange}
-//           />
-//           <HelpBlock>
-//             Please check your email ({fields.email}) for the confirmation code.
-//           </HelpBlock>
-//         </FormGroup>
-//         <hr />
-//         <FormGroup bsSize="large" controlId="password">
-//           <ControlLabel>New Password</ControlLabel>
-//           <FormControl
-//             type="password"
-//             value={fields.password}
-//             onChange={handleFieldChange}
-//           />
-//         </FormGroup>
-//         <FormGroup bsSize="large" controlId="confirmPassword">
-//           <ControlLabel>Confirm Password</ControlLabel>
-//           <FormControl
-//             type="password"
-//             value={fields.confirmPassword}
-//             onChange={handleFieldChange}
-//           />
-//         </FormGroup>
-//         <LoaderButton
-//           block
-//           type="submit"
-//           bsSize="large"
-//           isLoading={isConfirming}
-//           disabled={!validateResetForm()}
-//         >
-//           Confirm
-//         </LoaderButton>
-//       </form>
-//     );
-//   }
+	const renderConfirmationForm = () => {
+		return (
+			<form onSubmit={handleConfirmClick}>
+				<div id='code'>
+					<label htmlFor='code'>Confirmation Code</label>
+					<input
+						id='code'
+						autoFocus
+						type='tel'
+						value={fields.code}
+						onChange={handleFieldChange}
+					/>
+					<p>
+						Please check the email you signed up with for the reset confirmation
+						code.
+					</p>
+				</div>
+				<hr />
+				<div id='password'>
+					<label htmlFor='password'>New Password</label>
+					<input
+						id='password'
+						type='password'
+						value={fields.password}
+						onChange={handleFieldChange}
+					/>
+				</div>
+				<div id='confirmPassword'>
+					<label htmlFor='confirmPassword'>Confirm Password</label>
+					<input
+						id='confirmPassword'
+						type='password'
+						value={fields.confirmPassword}
+						onChange={handleFieldChange}
+					/>
+				</div>
+				<button type='submit' disabled={!validateResetForm()}>
+					{isConfirming ? "Confirming..." : "Confirm"}
+				</button>
+			</form>
+		);
+	};
 
-//   function renderSuccessMessage() {
-//     return (
-//       <div className="success">
-//         <Glyphicon glyph="ok" />
-//         <p>Your password has been reset.</p>
-//         <p>
-//           <Link to="/login">
-//             Click here to login with your new credentials.
-//           </Link>
-//         </p>
-//       </div>
-//     );
-//   }
+	const renderSuccessMessage = () => {
+		return (
+			<div className='success'>
+				<p>Your password has been reset.</p>
+				<p>
+					<span onclick={() => toggleFormState("signIn")}>
+						Click here to login with your new credentials.
+					</span>
+				</p>
+			</div>
+		);
+	};
 
-//   return (
-//     <div className="ResetPassword">
-//       {!codeSent
-//         ? renderRequestCodeForm()
-//         : !confirmed
-//         ? renderConfirmationForm()
-//         : renderSuccessMessage()}
-//     </div>
-//   );
-// }
+	return (
+		<>
+			<div className='ForgotPassword'>
+				{!codeSent
+					? renderRequestCodeForm()
+					: !confirmed
+					? renderConfirmationForm()
+					: renderSuccessMessage()}
+			</div>
+			<span onClick={() => toggleFormState("signUp")}>Sign Up</span>
+			<span onClick={() => toggleFormState("signIn")}>Sign In</span>
+		</>
+	);
+}
