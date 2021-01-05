@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import AWS, { Config } from "aws-sdk";
+import AWS from "aws-sdk";
 import awsmobile from "../aws-exports";
 
 const endpoint = new AWS.Endpoint(
@@ -31,7 +31,6 @@ export default function Users() {
 			const userProvider = new AWS.CognitoIdentityServiceProvider(
 				cognitoConfig
 			);
-			let userPoolDescription = {};
 			await userProvider.describeUserPool(
 				describeUserPoolConfig,
 				(err, data) => {
@@ -39,10 +38,6 @@ export default function Users() {
 						console.log("User Provider Unsuccessful ===> ", err);
 					} else {
 						setNumberOfUsers(data.UserPool.EstimatedNumberOfUsers);
-						console.log(
-							"User Pool Description Successful! ===> ",
-							userPoolDescription
-						);
 					}
 				}
 			);
@@ -51,8 +46,8 @@ export default function Users() {
 	});
 
 	return (
-		<section>
-			<h1>Users</h1>
+		<section className='p-5'>
+			<h1 className='text-2xl mb-5'>Users</h1>
 			<p>Number of user accounts created: {numberOfUsers}</p>
 		</section>
 	);
