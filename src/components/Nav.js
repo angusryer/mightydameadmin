@@ -1,12 +1,14 @@
 import React from "react";
+import Button from "./Button";
 
-export default function Nav({context, signOut}) {
+export default function Nav({ context, signOut }) {
 	return (
-		<nav>
-			You are currently logged in as: {context.username}
-			<button type='button' onClick={signOut}>
-				Sign Out
-			</button>
+		<nav className='h-20 bg-gray-200 p-3 flex flex-row justify-between'>
+			<span className="block content-center">
+				You are currently logged in as:{" "}
+				<span className='font-bold'>{context.username}</span>
+			</span>
+			<Button innerText="Sign Out" callBack={signOut} />
 		</nav>
 	);
 }

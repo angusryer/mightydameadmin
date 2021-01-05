@@ -1,4 +1,6 @@
 import React from "react";
+import Button from "./Button";
+import FunctionalLink from "./FunctionalLink";
 
 export default class SignIn extends React.Component {
 	state = {
@@ -49,27 +51,10 @@ export default class SignIn extends React.Component {
 									placeholder='******************'
 								/>
 							</div>
-							<div className='flex items-center justify-between'>
-								<button
-									onClick={() => this.props.signIn(this.state)}
-									className='bg-secondary hover:bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-									type='button'
-								>
-									Sign In
-								</button>
-								<span
-									className='inline-block align-baseline font-bold text-sm'
-									onClick={() => this.props.toggleFormState("forgotPassword")}
-								>
-									Forgot Password
-								</span>
-								<button
-									onClick={() => this.props.toggleFormState("signUp")}
-									className='bg-secondary hover:bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-									type='button'
-								>
-									Sign Up
-								</button>
+							<div className='flex flex-col items-center justify-between'>
+								<Button innerText="Sign In" callBack={() => this.props.signIn(this.state)} />
+								<Button innerText="Sign Up" callBack={() => this.props.toggleFormState("signUp")} />
+								<FunctionalLink innerText="Forgot your password?" callBack={() => this.props.toggleFormState("forgotPassword")} />
 							</div>
 						</form>
 					</div>

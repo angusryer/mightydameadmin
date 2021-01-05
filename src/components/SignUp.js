@@ -1,4 +1,6 @@
 import React from "react";
+import Button from "./Button";
+import FunctionalLink from "./FunctionalLink";
 
 class SignUp extends React.Component {
 	state = {
@@ -67,19 +69,8 @@ class SignUp extends React.Component {
 								/>
 							</div>
 							<div className='flex items-center justify-between'>
-								<button
-									onClick={() => this.props.signUp(this.state)}
-									className='bg-secondary hover:bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-									type='button'
-								>
-									Sign Up
-								</button>
-								<span
-									className='inline-block align-baseline font-bold text-sm'
-									onClick={() => this.props.toggleFormState("signIn")}
-								>
-									Already signed up?
-								</span>
+								<Button innerText="Sign Up" callBack={() => this.props.signUp(this.state)} />
+								<FunctionalLink innerText="Already have an account?" callBack={() => this.props.toggleFormState("signIn")} />
 							</div>
 						</form>
 					</div>

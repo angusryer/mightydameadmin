@@ -3,7 +3,6 @@ import { Auth } from "aws-amplify";
 import SignUp from "./components/SignUp";
 import ConfirmSignUp from "./components/ConfirmSignUp";
 import SignIn from "./components/SignIn";
-
 import ForgotPassword from "./components/ForgotPassword";
 import Admin from "./components/Admin";
 
@@ -11,11 +10,13 @@ export default function App() {
 	const [formState, setFormState] = useState("signUp");
 	const [isAdmin, setIsAdmin] = useState(false);
 	const [formError, setFormError] = useState(null);
+	const [adminPanel, setAdminPanel] = useState(false);
 
 	const authStateMessage = "You are currently logged out.";
 
 	const toggleFormState = (newFormState) => {
 		setFormState(newFormState);
+		setAdminPanel(false);
 		setFormError(null);
 	};
 
@@ -114,8 +115,9 @@ export default function App() {
 			.then((_res) => {
 				setFormState("signUp");
 				setIsAdmin(false);
-        setFormError(null);
-        window.location.href = "/"
+				setFormError(null);
+				setAdminPanel(false);
+				window.location.href = "/";
 			})
 			.catch((err) => {
 				setFormError(err.message);
@@ -135,9 +137,11 @@ export default function App() {
 
 			case "signedIn":
 				if (isAdmin) {
-					return <Admin signOut={signOut} />
+					setAdminPanel(true);
 				} else {
-					window.location.replace("https://main.d1yqt45w5sq9tb.amplifyapp.com/");
+					window.location.replace(
+						"https://main.d1yqt45w5sq9tb.amplifyapp.com/"
+					);
 				}
 				break;
 
@@ -149,12 +153,12 @@ export default function App() {
 		}
 	};
 
-	return (
-		<div className='flex flex-col'>
-			<div className='max-w-fw flex flex-col'>
-				<div className='pt-10'>
-					<span>{formError}</span>
-				</div>
+	return adminPanel ? (
+		<Admin signOut={signOut} />
+	) : (
+		<div className='flex flex-col items-center pt-5 '>
+			<div className='max-w-5xl flex flex-col pt-5'>
+				<span>{formError}</span>
 				{renderForm(formState, isAdmin)}
 			</div>
 		</div>
