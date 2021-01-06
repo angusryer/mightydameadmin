@@ -1,38 +1,27 @@
 import React, { useState, useEffect } from "react";
 import AWS from "aws-sdk";
-import awsmobile from "../aws-exports";
+import {awsconfig} from "../aws-config";
 
-const endpoint = new AWS.Endpoint(
-	"https://cognito-idp.ca-central-1.amazonaws.com"
-);
+const creds = new AWS.CognitoIdentityCredentials({
+	IdentityPoolId: awsconfig.identityPoolIds.main , //"ca-central-1:94d63211-9f29-4d48-8263-21e03c283d36",
+	RoleArn:  awsconfig.arns.roles.cognito //"arn:aws:iam::378986558342:role/mdf_cognitopoweruser"
+})
 
-const cognitoConfig = {
-	config: awsmobile,
-	region: "ca-central-1",
-	endpoint: endpoint,
-	apiVersions: "2016-04-18"
-};
-
-const describeUserPoolConfig = {
-	UserPoolId: "ca-central-1_Fh59Vzag6"
-};
-
-AWS.config.region = "ca-central-1";
-AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-	IdentityPoolId: "ca-central-1:94d63211-9f29-4d48-8263-21e03c283d36",
-	RoleArn: "arn:aws:iam::378986558342:role/mdf_cognitopoweruser"
+AWS.config.update({
+	region: awsconfig.regions.main, //"ca-central-1",
+	credentials: creds,
+	apiVersion: awsconfig.apiVersions.cognito //"2016-04-18"
 });
+
+const userProvider = new AWS.CognitoIdentityServiceProvider();
 
 export default function Users() {
 	const [numberOfUsers, setNumberOfUsers] = useState(0);
 
 	useEffect(() => {
 		const getUserQuantity = async () => {
-			const userProvider = new AWS.CognitoIdentityServiceProvider(
-				cognitoConfig
-			);
 			await userProvider.describeUserPool(
-				describeUserPoolConfig,
+				{ UserPoolId: awsconfig.userPoolIds.main }, //"ca-central-1_Fh59Vzag6"
 				(err, data) => {
 					if (err) {
 						console.log("User Provider Unsuccessful ===> ", err);

@@ -1,5 +1,6 @@
 import React from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
+import AWS from "aws-sdk";
 import { AdminContext, ContextProvider } from "../context/context";
 import Campaigns from "./Campaigns";
 import Dashboard from "./Dashboard";
