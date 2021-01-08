@@ -7,8 +7,8 @@ export const awsconfig = {
 	},
 	apiVersions: {
 		cognito: "2016-04-18",
-		dynamo: "",
-		s3: ""
+		dynamo: "2012-08-10",
+		s3: "2006-03-01"
 	},
 	identityPoolIds: {
 		main: "ca-central-1:94d63211-9f29-4d48-8263-21e03c283d36"
@@ -19,7 +19,8 @@ export const awsconfig = {
 	arns: {
 		roles: {
 			dynamo: "arn:aws:iam::378986558342:role/mdf_dynamopoweruser",
-			cognito: "arn:aws:iam::378986558342:role/mdf_cognitopoweruser"
+			cognito: "arn:aws:iam::378986558342:role/mdf_cognitopoweruser",
+			s3: "arn:aws:iam::378986558342:role/mdf_s3poweruser"
 		}
 	},
 	endpoints: {

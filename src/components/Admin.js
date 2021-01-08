@@ -1,8 +1,7 @@
 import React from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
-import AWS from "aws-sdk";
 import { AdminContext, ContextProvider } from "../context/context";
-import Campaigns from "./Campaigns";
+import Subscriptions from "./Subscriptions";
 import Dashboard from "./Dashboard";
 import Layout from "./Layout";
 import Products from "./Products";
@@ -27,7 +26,7 @@ export default function Admin({ signOut }) {
 								/>
 								<Route
 									path='/users'
-									render={(routeProps) => <Users {...routeProps} />}
+									render={(routeProps) => <Users {...routeProps} {...context} />}
 								/>
 								<Route
 									path='/programs'
@@ -38,8 +37,8 @@ export default function Admin({ signOut }) {
 									render={(routeProps) => <Products {...routeProps} />}
 								/>
 								<Route
-									path='/campaigns'
-									render={(routeProps) => <Campaigns {...routeProps} />}
+									path='/subscriptions'
+									render={(routeProps) => <Subscriptions {...routeProps} />}
 								/>
 								<Route
 									path='/reviews'
