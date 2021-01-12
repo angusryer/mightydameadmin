@@ -4,10 +4,10 @@ import deleteIcon from "../assets/icons/xicon.svg";
 
 export default function Review({
 	id,
-	rating,
 	title,
-	user,
 	comment,
+	rating,
+	ownerId,
 	deleteReview
 }) {
 	const [isActive, setIsActive] = useState(false);
@@ -37,14 +37,7 @@ export default function Review({
 			<span className='text-base'>{title}</span>
 			<blockquote className='text-sm'>{`"${comment}"`}</blockquote>
 			<div className='flex flex-row content-center'>
-				<div>
-					<img
-						className='w-8 h-8 text-xs'
-						src={user.image}
-						alt='Normal person'
-					/>
-				</div>
-				<span className='text-sm'>{user.name}</span>
+				<span className='text-sm'>Review Owner Id: {ownerId}</span>
 			</div>
 		</div>
 	);

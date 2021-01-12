@@ -3,6 +3,7 @@ import AWS from "aws-sdk";
 import { awsconfig } from "../aws-config";
 import Review from "./Review";
 import { v4 as uuid } from "uuid";
+import { getTableName } from "../lib/dbLib";
 
 const creds = new AWS.CognitoIdentityCredentials({
 	IdentityPoolId: awsconfig.identityPoolIds.main,
@@ -24,25 +25,8 @@ export default function Reviews() {
 	const [reviews, setReviews] = useState([]);
 
 	useEffect(() => {
-		getAllReviews("Review");
+		getAllReviews("Review-");
 	}, []);
-
-	const getTableName = (stringFragment) => {
-		return new Promise((resolve, reject) => {
-			db.listTables((err, data) => {
-				let table = "";
-				if (!err) {
-					table = data.TableNames.find((table) => {
-						return table.includes(stringFragment);
-					});
-					resolve(table);
-				} else {
-					console.log("listTables error ===> ", err);
-					reject();
-				}
-			});
-		});
-	};
 
 	const convertIncomingDataArray = (dataItemsArray) => {
 		const newDataItemsArray = dataItemsArray.map((item, _index) => {
@@ -51,17 +35,14 @@ export default function Reviews() {
 				comment: item.comment.S,
 				rating: item.rating.N,
 				title: item.title.S,
-				user: {
-					name: item.user.M.name.S,
-					image: item.user.M.image.S
-				}
+				ownerId: item.ownerId.S,
 			};
 		});
 		return newDataItemsArray;
 	};
 
 	const getAllReviews = async (searchFragment) => {
-		const tableName = await getTableName(searchFragment);
+		const tableName = await getTableName(searchFragment, db);
 		queryParams.TableName = tableName;
 
 		db.scan(queryParams, (err, data) => {
@@ -75,8 +56,7 @@ export default function Reviews() {
 	};
 
 	const deleteReview = async (id) => {
-		const tableName = await getTableName("Review");
-		console.log("Deleting review ==> ", id, "from table ", tableName);
+		const tableName = await getTableName("Review", db);
 		db.deleteItem(
 			{
 				TableName: tableName,
@@ -88,7 +68,7 @@ export default function Reviews() {
 			},
 			(err, _data) => {
 				if (!err) {
-					getAllReviews("Review");
+					getAllReviews("Review-");
 				} else {
 					console.error("Delete review unsuccessful ==> ", err);
 				}
@@ -97,37 +77,31 @@ export default function Reviews() {
 	};
 
 	const sendReviewToDynamo = async (reviewObject) => {
-		const tableName = await getTableName("Review");
+		const tableName = await getTableName("Review", db);
 		const putParams = {
 			TableName: tableName,
 			Item: {
 				id: {
 					S: reviewObject.id
 				},
-				title: {
-					S: reviewObject.title
-				},
 				comment: {
 					S: reviewObject.comment
+				},
+				title: {
+					S: reviewObject.title
 				},
 				rating: {
 					N: reviewObject.rating
 				},
-				user: {
-					M: {
-						name: {
-							S: reviewObject.user.name
-						},
-						image: {
-							S: reviewObject.user.image
-						}
-					}
+				ownerId: {
+					S: reviewObject.ownerId
 				}
 			}
 		};
+
 		db.putItem(putParams, (err, _data) => {
 			if (!err) {
-				getAllReviews("Review");
+				getAllReviews("Review-");
 			} else {
 				console.error("Add review unsuccessful ==> ", err);
 			}
@@ -139,22 +113,18 @@ export default function Reviews() {
 		// TODO validation checks
 		const reviewObject = {
 			id: uuid(),
-			user: {
-				name: event.target["name"].value,
-				image: event.target["image"].value
-			},
+			title: event.target["title"].value,
 			comment: event.target["comment"].value,
 			rating: event.target["rating"].value,
-			title: event.target["title"].value
+			ownerId: event.target["ownerId"].value
 		};
 
 		sendReviewToDynamo(reviewObject);
 
-		event.target["name"].value = "";
-		event.target["image"].value = "";
+		event.target["title"].value = "";
 		event.target["comment"].value = "";
 		event.target["rating"].value = null;
-		event.target["title"].value = "";
+		event.target["ownerId"].value = "";
 	};
 
 	return (
@@ -169,13 +139,8 @@ export default function Reviews() {
 							onSubmit={(event) => addReview(event)}
 						>
 							<div className='flex'>
-								<label htmlFor='rating'>Rating</label>
-								<input
-									className='pl-5'
-									name='rating'
-									id='rating'
-									type='number'
-								/>
+								<label htmlFor='title'>Title</label>
+								<input className='pl-5' name='title' id='title' type='text' />
 							</div>
 							<div className='flex'>
 								<label htmlFor='comment'>Comment</label>
@@ -187,18 +152,24 @@ export default function Reviews() {
 								/>
 							</div>
 							<div className='flex'>
-								<label htmlFor='name'>Username</label>
-								<input className='pl-5' name='name' id='name' type='text' />
+								<label htmlFor='rating'>Rating</label>
+								<input
+									className='pl-5'
+									name='rating'
+									id='rating'
+									type='number'
+								/>
 							</div>
 							<div className='flex'>
-								<label htmlFor='title'>Review Title</label>
-								<input className='pl-5' name='title' id='title' type='text' />
+								<label htmlFor='owner'>Review Owner Id</label>
+								<input
+									className='pl-5'
+									name='ownerId'
+									id='ownerId'
+									type='text'
+								/>
 							</div>
-							<div className='flex'>
-								<label htmlFor='image'>User Image</label>
-								<input className='pl-5' name='image' id='image' type='text' />
-							</div>
-							<button type='submit'>Add Review</button>
+							<button type='submit' className="border-gray-200">Add Review</button>
 						</form>
 					</div>
 				</div>
