@@ -72,6 +72,7 @@ export default function App() {
 				setFormError(null);
 			})
 			.catch((err) => {
+				console.log(err);
 				setFormError(err.message);
 			});
 	};
@@ -113,10 +114,6 @@ export default function App() {
 	const signOut = async () => {
 		await Auth.signOut()
 			.then((_res) => {
-				setFormState("signUp");
-				setIsAdmin(false);
-				setFormError(null);
-				setAdminPanel(false);
 				window.location.href = "/";
 			})
 			.catch((err) => {

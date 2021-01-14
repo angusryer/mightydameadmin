@@ -16,9 +16,6 @@ export default function Product({
 	otherImageFileNames,
 	available,
 	brand,
-	numberOfSessions,
-	lengthOfSessionInHours,
-	frequencyOfSessionsPerWeek,
 	deleteProduct
 }) {
 	const [isActive, setIsActive] = useState(false);
@@ -108,9 +105,6 @@ export default function Product({
 				</div>
 				<span className='text-base'>{`Available: ${available}`}</span>
 				<span className='text-base'>{`Brand: ${brand}`}</span>
-				<span className='text-base'>{`Total No. of Sessions: ${numberOfSessions}`}</span>
-				<span className='text-base'>{`Length of Session (hrs): ${lengthOfSessionInHours}`}</span>
-				<span className='text-base'>{`Frequency of Sessions (per wk): ${frequencyOfSessionsPerWeek}`}</span>
 			</div>
 		</div>
 	);

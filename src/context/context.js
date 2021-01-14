@@ -13,6 +13,14 @@ export function ContextProvider({ children }) {
 	useEffect(() => {
 		const getUser = async () => {
 			const user = await Auth.currentAuthenticatedUser();
+			if (user.attributes["sub"]) {
+				Object.defineProperty(
+					user.attributes,
+					"cognitoId",
+					Object.getOwnPropertyDescriptor(user.attributes, "sub")
+				);
+				delete user.attributes["sub"];
+			}
 			setCurrentUser(user);
 		};
 		getUser();

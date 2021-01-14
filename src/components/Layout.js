@@ -7,10 +7,10 @@ export default function Layout({ context, children, signOut }) {
 	return (
 		<>
 			<Nav context={context} signOut={signOut} />
-			<div className='flex flex-row'>
+			<main>
 				<SideBar />
 				{children}
-			</div>
+			</main>
 			<Footer />
 		</>
 	);

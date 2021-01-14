@@ -98,10 +98,7 @@ export default function Products() {
 				otherImageUrls: productObject.otherImageUrls,
 				otherImageFileNames: productObject.otherImageFileNames,
 				available: productObject.available,
-				brand: productObject.brand,
-				numberOfSessions: productObject.numberOfSessions,
-				lengthOfSessionInHours: productObject.lengthOfSessionInHours,
-				frequencyOfSessionsPerWeek: productObject.frequencyOfSessionsPerWeek
+				brand: productObject.brand
 			}
 		};
 
@@ -127,11 +124,7 @@ export default function Products() {
 			price: event.target["price"].value,
 			salePrice: event.target["salePrice"].value,
 			available: event.target["available"].checked,
-			brand: event.target["brand"].value,
-			numberOfSessions: event.target["numberOfSessions"].value,
-			lengthOfSessionInHours: event.target["lengthOfSessionInHours"].value,
-			frequencyOfSessionsPerWeek:
-				event.target["frequencyOfSessionsPerWeek"].value
+			brand: event.target["brand"].value
 		};
 
 		const keywordText = event.target["keywords"].value;
@@ -211,9 +204,6 @@ export default function Products() {
 		event.target["otherImageFileNames"].value = null;
 		event.target["available"].checked = false;
 		event.target["brand"].value = "";
-		event.target["numberOfSessions"].value = 0;
-		event.target["lengthOfSessionInHours"].value = 0;
-		event.target["frequencyOfSessionsPerWeek"].value = 0;
 
 		const creds = new AWS.CognitoIdentityCredentials({
 			IdentityPoolId: awsconfig.identityPoolIds.main,
@@ -329,42 +319,6 @@ export default function Products() {
 							<div className='flex'>
 								<label htmlFor='brand'>Brand</label>
 								<input className='pl-5' name='brand' id='brand' type='text' />
-							</div>
-							<div className='flex'>
-								<label htmlFor='numberOfSessions'>
-									Total Number of Sessions
-								</label>
-								<input
-									className='pl-5'
-									name='numberOfSessions'
-									id='numberOfSessions'
-									type='number'
-									step='0.01'
-								/>
-							</div>
-							<div className='flex'>
-								<label htmlFor='lengthOfSessionInHours'>
-									Length of Each Session (Hrs)
-								</label>
-								<input
-									className='pl-5'
-									name='lengthOfSessionInHours'
-									id='lengthOfSessionInHours'
-									type='number'
-									step='0.01'
-								/>
-							</div>
-							<div className='flex'>
-								<label htmlFor='frequencyOfSessionsPerWeek'>
-									Frequency of Sessions (per wk)
-								</label>
-								<input
-									className='pl-5'
-									name='frequencyOfSessionsPerWeek'
-									id='frequencyOfSessionsPerWeek'
-									type='number'
-									step='0.01'
-								/>
 							</div>
 							<button type='submit' className='border-gray-200'>
 								Add Product
