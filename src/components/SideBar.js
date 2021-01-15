@@ -1,15 +1,29 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React from "react";
+import { NavLink } from "react-router-dom";
 
 export default function SideBar() {
-    return (
-        <aside className="flex flex-col min-w-min pl-5 pr-5 bg-gray-200">
-            <Link to="/dashboard">Dashboard</Link>
-            <Link to="/users">Users</Link>
-            <Link to="/subscriptions">Subscriptions</Link>
-            <Link to="/programs">Programs</Link>
-            <Link to="/products">Products</Link>
-            <Link to="/reviews">Reviews</Link>
-        </aside>
-    )
+	let style = `w-32 pl-3 hover:bg-purple-50 border rounded`;
+
+	return (
+		<aside className='flex flex-col min-w-min p-5 bg-gray-200'>
+			<NavLink className={style} activeClassName="active-link" to='/dashboard'>
+				Dashboard
+			</NavLink>
+			<NavLink className={style} activeClassName="active-link" to='/users'>
+				Users
+			</NavLink>
+			<NavLink className={style} activeClassName="active-link" to='/subscriptions'>
+				Subscriptions
+			</NavLink>
+			<NavLink className={style} activeClassName="active-link" to='/programs'>
+				Programs
+			</NavLink>
+			<NavLink className={style} activeClassName="active-link" to='/products'>
+				Products
+			</NavLink>
+			<NavLink className={style} activeClassName="active-link" to='/reviews'>
+				Reviews
+			</NavLink>
+		</aside>
+	);
 }

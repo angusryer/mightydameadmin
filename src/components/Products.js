@@ -217,7 +217,7 @@ export default function Products() {
 	};
 
 	return (
-		<section className='p-5 w-full'>
+		<>
 			<h1>Products</h1>
 			<div className='mt-5 flex flex-row w-full'>
 				<div className='flex flex-col w-full max-w-xs'>
@@ -342,6 +342,6 @@ export default function Products() {
 					</div>
 				</div>
 			</div>
-		</section>
+		</>
 	);
 }

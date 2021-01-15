@@ -1,181 +1,160 @@
-import React, { useState } from "react";
+import React from "react";
+import Input from "./Input";
+import SelectInput from "./SelectInput";
+import { useFormFields } from "../lib/hooksLib";
 
-export default function UpdateUser({ user, confirmUpdateUser }) {
-	const { id, firstName, lastName, displayName } = user;
+export default function UpdateUser({
+	confirmUpdateUser,
+	selectedUser,
+	setUpdateActive
+}) {
+	const [formFields, setFormFields] = useFormFields(selectedUser);
 
-	const [userValues, setUserValues] = useState({
-		id,
-		firstName,
-		lastName,
-		displayName
-	});
+	const styleConfig = {
+		containerStyles: `mt-1 flex flex-nowrap`,
+		labelStyles: `w-60`,
+		inputStyles: `ml-2 bg-gray-100 rounded w-full p-0.5`
+	};
+
+	const selectOptions = ["PUBLIC", "MEMBER", "ADMIN"];
+
 	return (
-		<form onSubmit={(e) => confirmUpdateUser(e)}>
-			<div className='mt-1 flex flex-nowrap'>
-				<label htmlFor='firstName' className='w-60'>
-					First Name
-				</label>
-				<input
-					type='text'
-					name='firstName'
-					id='firstName'
-					value={userValues.firstName}
-					onChange={setUserValues({
-						...userValues,
-						firstName: (e) => e.target["firstName"].value
-					})}
-					className='ml-2 bg-gray-300 rounded w-full p-0.5'
-				/>
-			</div>
-			<div className='mt-1 flex flex-nowrap'>
-				<label htmlFor='lastName' className='w-60'>
-					Last Name
-				</label>
-				<input
-					type='text'
-					name='lastName'
-					id='lastName'
-					className='ml-2 bg-gray-300 rounded w-full p-0.5'
-				/>
-			</div>
-			<div className='mt-1 flex flex-nowrap'>
-				<label htmlFor='displayName' className='w-60'>
-					Display Name
-				</label>
-				<input
-					type='text'
-					name='displayName'
-					id='displayName'
-					className='ml-2 bg-gray-300 rounded w-full p-0.5'
-				/>
-			</div>
-			<div className='mt-1 flex flex-nowrap'>
-				<label htmlFor='email' className='w-60'>
-					Email
-				</label>
-				<input
-					type='email'
-					name='email'
-					id='email'
-					className='ml-2 bg-gray-300 rounded w-full p-0.5'
-				/>
-			</div>
-			<div className='mt-1 flex flex-nowrap'>
-				<label htmlFor='userType' className='w-60'>
-					User Type
-				</label>
-				<select
-					name='userType'
-					id='userType'
-					className='ml-2 bg-gray-300 rounded w-full p-0.5'
+		<form onSubmit={(e) => confirmUpdateUser(e, formFields)}>
+			<Input
+				identifier='firstName'
+				label='First Name'
+				type='text'
+				styles={styleConfig}
+				changeHandler={setFormFields}
+				value={formFields.firstName}
+			/>
+			<Input
+				identifier='lastName'
+				label='Last Name'
+				type='text'
+				styles={styleConfig}
+				changeHandler={setFormFields}
+				value={formFields.lastName}
+			/>
+			<Input
+				identifier='displayName'
+				label='Display Name'
+				type='text'
+				styles={styleConfig}
+				changeHandler={setFormFields}
+				value={formFields.displayName}
+			/>
+			<Input
+				identifier='userName'
+				label='userName'
+				type='text'
+				styles={styleConfig}
+				changeHandler={() => {}}
+				value={formFields.userName}
+			/>
+			<Input
+				identifier='email'
+				label='Email'
+				type='email'
+				styles={styleConfig}
+				changeHandler={() => {}}
+				value={formFields.email}
+			/>
+			<SelectInput
+				identifier='userType'
+				label='User Type'
+				options={selectOptions}
+				styles={styleConfig}
+				changeHandler={setFormFields}
+				value={formFields.userType}
+			/>
+			<Input
+				identifier='streetAddressOne'
+				label='Street Address One'
+				type='text'
+				styles={styleConfig}
+				changeHandler={setFormFields}
+				value={formFields.streetAddressOne}
+			/>
+			<Input
+				identifier='streetAddressTwo'
+				label='Street Address Two'
+				type='text'
+				styles={styleConfig}
+				changeHandler={setFormFields}
+				value={formFields.streetAddressTwo}
+			/>
+			<Input
+				identifier='city'
+				label='City'
+				type='text'
+				styles={styleConfig}
+				changeHandler={setFormFields}
+				value={formFields.city}
+			/>
+			<Input
+				identifier='provinceState'
+				label='Province/State'
+				type='text'
+				styles={styleConfig}
+				changeHandler={setFormFields}
+				value={formFields.provinceState}
+			/>
+			<Input
+				identifier='country'
+				label='Country'
+				type='text'
+				styles={styleConfig}
+				changeHandler={setFormFields}
+				value={formFields.country}
+			/>
+			<Input
+				identifier='postalZip'
+				label='Postal/Zip Code'
+				type='text'
+				styles={styleConfig}
+				changeHandler={setFormFields}
+				value={formFields.postalZip}
+			/>
+			<Input
+				identifier='phone'
+				label='Phone'
+				type='tel'
+				styles={styleConfig}
+				changeHandler={setFormFields}
+				value={formFields.phone}
+			/>
+			<Input
+				identifier='isSubscribed'
+				label='Subscribed?'
+				type='checkbox'
+				styles={styleConfig}
+				changeHandler={setFormFields}
+				value={formFields.isSubscribed}
+			/>
+			<Input
+				identifier='avatarUrl'
+				label='User Avatar'
+				type='url'
+				styles={styleConfig}
+				changeHandler={setFormFields}
+				value={formFields.avatarUrl}
+			/>
+			<div className='flex'>
+				<button
+					type='submit'
+					className='border-black hover:bg-purple-200 w-full align-middle text-center border rounded'
 				>
-					<option value='PUBLIC'>PUBLIC</option>
-					<option value='MEMBER'>MEMBER</option>
-					<option value='ADMIN'>ADMIN</option>
-				</select>
+					Update User
+				</button>
+				<button
+					type='button'
+					className='border-black hover:bg-purple-200 w-full align-middle text-center border rounded'
+					onClick={() => setUpdateActive(false)}
+				>
+					Cancel
+				</button>
 			</div>
-			<div className='mt-1 flex flex-nowrap'>
-				<label htmlFor='streetAddressOne' className='w-60'>
-					Street Address
-				</label>
-				<input
-					type='text'
-					name='streetAddressOne'
-					id='streetAddressOne'
-					className='ml-2 bg-gray-300 rounded w-full p-0.5'
-				/>
-			</div>
-			<div className='mt-1 flex flex-nowrap'>
-				<label htmlFor='streetAddressTwo' className='w-60'>
-					Street Address Con't
-				</label>
-				<input
-					type='text'
-					name='streetAddressTwo'
-					id='streetAddressTwo'
-					className='ml-2 bg-gray-300 rounded w-full p-0.5'
-				/>
-			</div>
-			<div className='mt-1 flex flex-nowrap'>
-				<label htmlFor='city' className='w-60'>
-					City
-				</label>
-				<input
-					type='text'
-					name='city'
-					id='city'
-					className='ml-2 bg-gray-300 rounded w-full p-0.5'
-				/>
-			</div>
-			<div className='mt-1 flex flex-nowrap'>
-				<label htmlFor='provinceState' className='w-60'>
-					Province/State
-				</label>
-				<input
-					type='text'
-					name='provinceState'
-					id='provinceState'
-					className='ml-2 bg-gray-300 rounded w-full p-0.5'
-				/>
-			</div>
-			<div className='mt-1 flex flex-nowrap'>
-				<label htmlFor='country' className='w-60'>
-					Country
-				</label>
-				<input
-					type='text'
-					name='country'
-					id='country'
-					className='ml-2 bg-gray-300 rounded w-full p-0.5'
-				/>
-			</div>
-			<div className='mt-1 flex flex-nowrap'>
-				<label htmlFor='postalZip' className='w-60'>
-					Postal/Zip Code
-				</label>
-				<input
-					type='text'
-					name='postalZip'
-					id='postalZip'
-					className='ml-2 bg-gray-300 rounded w-full p-0.5'
-				/>
-			</div>
-			<div className='mt-1 flex flex-nowrap'>
-				<label htmlFor='phone' className='w-60'>
-					Phone
-				</label>
-				<input
-					type='tel'
-					name='phone'
-					id='phone'
-					className='ml-2 bg-gray-300 rounded w-full p-0.5'
-				/>
-			</div>
-			<div className='mt-1 flex flex-nowrap'>
-				<label htmlFor='isSubscribed' className='w-60'>
-					Subscribed?
-				</label>
-				<input
-					type='checkbox'
-					name='isSubscribed'
-					id='isSubscribed'
-					className='ml-2 bg-gray-300 rounded w-full p-0.5'
-				/>
-			</div>
-			<div className='mt-1 flex flex-nowrap'>
-				<label htmlFor='avatarUrl' className='w-60'>
-					User Avatar
-				</label>
-				<input
-					type='url'
-					name='avatarUrl'
-					id='avatarUrl'
-					className='ml-2 bg-gray-300 rounded w-full p-0.5'
-				/>
-			</div>
-			<button type='submit' className='border-black'>
-				Add New User
-			</button>
 		</form>
 	);
 }

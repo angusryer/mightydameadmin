@@ -7,11 +7,11 @@ export default function Layout({ context, children, signOut }) {
 	return (
 		<>
 			<Nav context={context} signOut={signOut} />
-			<main>
+			<main className='flex'>
 				<SideBar />
-				{children}
+				<section className='p-5 w-full'>{children}</section>
 			</main>
-			<Footer />
+			<Footer {...context} />
 		</>
 	);
 }

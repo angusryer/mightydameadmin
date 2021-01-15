@@ -1,8 +1,9 @@
 const aws = require("aws-sdk");
 const uuid = require("uuid");
+const utilities = require("./utilityLib");
 const ddb = new aws.DynamoDB({ apiVersion: "2012-10-08" });
 
-module.exports = async (event, context, callback) => {
+module.exports = async (event, context, callback, isAdmin) => {
 	let date = new Date();
 	const tableName = process.env.TABLE_NAME;
 	const region = process.env.REGION;
@@ -22,14 +23,19 @@ module.exports = async (event, context, callback) => {
 					S: null
 				}
 			},
-			UpdateExpression: "SET #a = :r, #b = :r",
+			UpdateExpression:
+				"SET #cognitoId = :subId, #date = :date, #userType = :userType, #userName = :userName",
 			ExpressionAttributeNames: {
-				"#a": "cognitoId",
-				"#b": "dateRegistered"
+				"#cognitoId": "cognitoId",
+				"#date": "dateRegistered",
+				"#userType": "userType",
+				userName: "userName"
 			},
 			ExpressionAttributeValues: {
-				":r": event.request.userAttributes.sub,
-				":d": date.toISOString()
+				":subId": event.request.userAttributes.sub,
+				":date": utilities.getFormattedDate(new Date()),
+				":userType": isAdmin ? "ADMIN" : "MEMBER",
+				":userName": event.userName
 			}
 		};
 
@@ -40,10 +46,11 @@ module.exports = async (event, context, callback) => {
 				cognitoId: { S: event.request.userAttributes.sub },
 				firstName: { S: "" },
 				lastName: { S: "" },
-				displayName: { S: event.userName },
+				displayName: { S: "" },
+				userName: { S: event.userName },
 				email: { S: event.request.userAttributes.email },
 				dateRegistered: { S: date.toISOString() },
-				userType: { S: "MEMBER" },
+				userType: { S: isAdmin ? "ADMIN" : "MEMBER" },
 				streetAddressOne: { S: "" },
 				streetAddressTwo: { S: "" },
 				city: { S: "" },
@@ -74,26 +81,25 @@ module.exports = async (event, context, callback) => {
 				updateUserParams.Key.id.S = existingUser.id;
 				await ddb
 					.update(updateUserParams, (err, _data) => {
-						if (err) return callback(err);
+						if (err) {
+							callback(err);
+						}
 					})
 					.promise();
-				console.log("DB UPDATE ==> ", event);
 				callback(null, event);
 			} else {
 				await ddb
 					.putItem(addUserParams, (err, _data) => {
-						if (err) return callback(err);
+						if (err) {
+							callback(err);
+						}
 					})
 					.promise();
-				console.log("DB ADD ==> ", event);
-
 				callback(null, event);
 			}
 		} catch (err) {
 			callback(err);
 		}
 	}
-	console.log("END OF FUNCTION ==> ", event);
-
 	callback(null, event);
 };
