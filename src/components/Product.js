@@ -37,7 +37,7 @@ export default function Product({
 	const getImage = async (filename) => {
 		const response = s3
 			.getObject({
-				Bucket: "mightydamegatsbybucket143702-dev",
+				Bucket: "mightydamegatsbybucket143702-dev/public",
 				Key: filename
 			})
 			.promise();

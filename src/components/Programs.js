@@ -20,6 +20,7 @@
 
 import React, { useState, useEffect } from "react";
 import AWS from "aws-sdk";
+// import path from "path";
 import { awsconfig } from "../aws-config";
 import Program from "./Program";
 import { v4 as uuid } from "uuid";
@@ -157,52 +158,71 @@ export default function Programs() {
 		});
 
 		let imagePromises = [];
-		const mainImageFileName =
-			"main-" + uuid() + "-" + event.target["mainImageFileName"].files[0].name;
-		imagePromises.push(
-			new AWS.S3.ManagedUpload({
-				params: {
-					Body: event.target["mainImageFileName"].files[0],
-					Bucket: "mightydamegatsbybucket143702-dev",
-					Key: `${mainImageFileName}`
-				}
-			}).promise()
-		);
+		if (event.target["mainImageFileName"].files.length > 0) {
+			const mainImageFileName =
+				"main-" +
+				uuid() +
+				"-" +
+				event.target["mainImageFileName"].files[0].name;
 
-		let otherImageFileNames = [];
-		for (let i = 0; i < otherImages.length; i++) {
-			otherImageFileNames.push(uuid() + "-" + otherImages[i].name);
-			const imageKey = otherImageFileNames[otherImageFileNames.length - 1];
 			imagePromises.push(
 				new AWS.S3.ManagedUpload({
 					params: {
-						Body: otherImages[i],
-						Bucket: "mightydamegatsbybucket143702-dev",
-						Key: imageKey
+						Body: event.target["mainImageFileName"].files[0],
+						Bucket: "mightydamegatsbybucket143702-dev/public",
+						Key: `${mainImageFileName}`
 					}
 				}).promise()
 			);
 		}
 
-		Promise.all(imagePromises).then((resValues) => {
-			programObject.keywords = keywordList;
-			programObject.categories = categoryList;
-			const otherFiles = resValues
-				.filter((img) => img.Key.substring(0, 5) !== "main-")
-				.map((img) => img.Key);
-			const otherUrls = resValues
-				.filter((img) => img.Key.substring(0, 5) !== "main-")
-				.map((img) => img.Location);
-			programObject.otherImageFileNames = otherFiles;
-			programObject.otherImageUrls = otherUrls;
-			programObject.mainImageFileName = resValues.find(
-				(img) => img.Key.substring(0, 5) === "main-"
-			).Key;
-			programObject.mainImageUrl = resValues.find(
-				(img) => img.Key.substring(0, 5) === "main-"
-			).Location;
-			sendProgramToDynamo(programObject);
-		});
+		let otherImageFileNames = [];
+		for (let i = 0; i < otherImages.length; i++) {
+			if (otherImages.length > 0) {
+				otherImageFileNames.push(uuid() + "-" + otherImages[i].name);
+				const imageKey = otherImageFileNames[otherImageFileNames.length - 1];
+				imagePromises.push(
+					new AWS.S3.ManagedUpload({
+						params: {
+							Body: otherImages[i],
+							Bucket: "mightydamegatsbybucket143702-dev/public",
+							Key: imageKey
+						}
+					}).promise()
+				);
+			}
+		}
+
+		const SUB_STRING_VAL = 12;
+		const IMG_KEY_STRING = "public/main-";
+
+		if (imagePromises.length > 0) {
+			Promise.all(imagePromises).then((resValues) => {
+				programObject.keywords = keywordList;
+				programObject.categories = categoryList;
+				const otherFiles = resValues
+					.filter(
+						(img) => img.Key.substring(0, SUB_STRING_VAL) !== IMG_KEY_STRING
+					)
+					.map((img) => img.Key.replace("public/", ""));
+				const otherUrls = resValues
+					.filter(
+						(img) => img.Key.substring(0, SUB_STRING_VAL) !== IMG_KEY_STRING
+					)
+					.map((img) => img.Location);
+				programObject.otherImageFileNames = otherFiles;
+				programObject.otherImageUrls = otherUrls;
+				programObject.mainImageFileName = resValues
+					.find(
+						(img) => img.Key.substring(0, SUB_STRING_VAL) === IMG_KEY_STRING
+					)
+					.Key.replace("public/", "");
+				programObject.mainImageUrl = resValues.find(
+					(img) => img.Key.substring(0, SUB_STRING_VAL) === IMG_KEY_STRING
+				).Location;
+				sendProgramToDynamo(programObject);
+			});
+		}
 
 		event.target["title"].value = "";
 		event.target["shortDescription"].value = "";
