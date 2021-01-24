@@ -137,7 +137,7 @@ export default function App() {
 					setAdminPanel(true);
 				} else {
 					window.location.replace(
-						"https://main.d1yqt45w5sq9tb.amplifyapp.com/"
+						"https://www.mightydame.com/"
 					);
 				}
 				break;
