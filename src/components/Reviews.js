@@ -16,6 +16,7 @@ AWS.config.update({
 });
 
 const db = new AWS.DynamoDB();
+const dbdoc = new AWS.DynamoDB.DocumentClient();
 
 const queryParams = {
 	TableName: ""
@@ -23,9 +24,12 @@ const queryParams = {
 
 export default function Reviews() {
 	const [reviews, setReviews] = useState([]);
+	const [users, setUsers] = useState([]);
+	const [selectedUser, setSelectedUser] = useState("");
 
 	useEffect(() => {
 		getAllReviews("Review-");
+		getUserList("User-");
 	}, []);
 
 	const convertIncomingDataArray = (dataItemsArray) => {
@@ -36,9 +40,27 @@ export default function Reviews() {
 				rating: item.rating.N,
 				title: item.title.S,
 				ownerId: item.ownerId.S,
+				user: {
+					id: item.user?.M.id.S,
+					avatarUrl: item.user?.M.avatarUrl?.S,
+					displayName: item.user?.M.displayName?.S
+				}
 			};
 		});
 		return newDataItemsArray;
+	};
+
+	const getUserList = async (searchFragment) => {
+		const tableName = await getTableName(searchFragment, db);
+		queryParams.TableName = tableName;
+
+		dbdoc.scan(queryParams, (err, data) => {
+			if (!err) {
+				setUsers(data.Items);
+			} else {
+				console.error("DB Provider Unsuccessful ===> ", err);
+			}
+		});
 	};
 
 	const getAllReviews = async (searchFragment) => {
@@ -95,6 +117,19 @@ export default function Reviews() {
 				},
 				ownerId: {
 					S: reviewObject.ownerId
+				},
+				user: {
+					M: {
+						id: {
+							S: reviewObject.user.id
+						},
+						displayName: {
+							S: reviewObject.user.displayName
+						},
+						avatarUrl: {
+							S: reviewObject.user.avatarUrl
+						}
+					}
 				}
 			}
 		};
@@ -111,12 +146,20 @@ export default function Reviews() {
 	const addReview = (event) => {
 		event.preventDefault();
 		// TODO validation checks
+
+		const userInfo = getUserInfo(event.target["displayName"].value);
+
 		const reviewObject = {
 			id: uuid(),
 			title: event.target["title"].value,
 			comment: event.target["comment"].value,
 			rating: event.target["rating"].value,
-			ownerId: event.target["ownerId"].value
+			ownerId: userInfo.id,
+			user: {
+				id: userInfo.id,
+				displayName: userInfo.displayName,
+				avatarUrl: userInfo.avatarUrl
+			}
 		};
 
 		sendReviewToDynamo(reviewObject);
@@ -124,7 +167,16 @@ export default function Reviews() {
 		event.target["title"].value = "";
 		event.target["comment"].value = "";
 		event.target["rating"].value = null;
-		event.target["ownerId"].value = "";
+		event.target["displayName"].value = "";
+	};
+
+	const getUserInfo = (selectedUserName) => {
+		return users.find((user) => user.displayName === selectedUserName);
+	};
+
+	const updateSelectedUser = (selectedValue) => {
+		const newSelectedUser = getUserInfo(selectedValue);
+		setSelectedUser(newSelectedUser);
 	};
 
 	return (
@@ -161,15 +213,27 @@ export default function Reviews() {
 								/>
 							</div>
 							<div className='flex'>
-								<label htmlFor='owner'>Review Owner Id</label>
-								<input
+								<label htmlFor='owner'>Review Owner</label>
+								<select
 									className='pl-5'
-									name='ownerId'
-									id='ownerId'
-									type='text'
-								/>
+									name='displayName'
+									id='displayName'
+									value={selectedUser}
+									onChange={(e) => updateSelectedUser(e.target.value)}
+								>
+									{users.length > 0 &&
+										users.map((user) => {
+											return (
+												<option key={user.id} value={user.displayName}>
+													{user.displayName}
+												</option>
+											);
+										})}
+								</select>
 							</div>
-							<button type='submit' className="border-gray-200">Add Review</button>
+							<button type='submit' className='border-gray-200'>
+								Add Review
+							</button>
 						</form>
 					</div>
 				</div>

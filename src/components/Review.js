@@ -7,7 +7,7 @@ export default function Review({
 	title,
 	comment,
 	rating,
-	ownerId,
+	user,
 	deleteReview
 }) {
 	const [isActive, setIsActive] = useState(false);
@@ -31,13 +31,13 @@ export default function Review({
 				)}
 			</div>
 			<div className='flex flex-row flex-nowrap'>
-				<Rating value={rating} height='5' />
+				<Rating value={rating} />
 				<span>{`${rating} bars`}</span>
 			</div>
 			<span className='text-base'>{title}</span>
 			<blockquote className='text-sm'>{`"${comment}"`}</blockquote>
 			<div className='flex flex-row content-center'>
-				<span className='text-sm'>Review Owner Id: {ownerId}</span>
+				<span className='text-sm'>Review Owner: {user.displayName}</span>
 			</div>
 		</div>
 	);
